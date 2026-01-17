@@ -283,6 +283,7 @@ var en_default = {
     "7d_sonnet": "7d-S"
   },
   time: {
+    days: "d",
     hours: "h",
     minutes: "m",
     seconds: "s"
@@ -317,6 +318,7 @@ var ko_default = {
     "7d_sonnet": "7\uC77C-S"
   },
   time: {
+    days: "\uC77C",
     hours: "\uC2DC\uAC04",
     minutes: "\uBD84",
     seconds: "\uCD08"
@@ -381,8 +383,13 @@ function formatTimeRemaining(resetAt, t) {
   if (diffMs <= 0)
     return `0${t.time.minutes}`;
   const totalMinutes = Math.floor(diffMs / (1e3 * 60));
-  const hours = Math.floor(totalMinutes / 60);
+  const totalHours = Math.floor(totalMinutes / 60);
+  const days = Math.floor(totalHours / 24);
+  const hours = totalHours % 24;
   const minutes = totalMinutes % 60;
+  if (days > 0) {
+    return `${days}${t.time.days}${hours}${t.time.hours}`;
+  }
   if (hours > 0) {
     return `${hours}${t.time.hours}${minutes}${t.time.minutes}`;
   }
@@ -561,7 +568,12 @@ var rateLimit7dWidget = {
   render(data, ctx) {
     const { translations: t } = ctx;
     const color = getColorForPercent(data.utilization);
-    return `${t.labels["7d_all"]}: ${colorize(`${data.utilization}%`, color)}`;
+    let text = `${t.labels["7d_all"]}: ${colorize(`${data.utilization}%`, color)}`;
+    if (data.resetsAt) {
+      const remaining = formatTimeRemaining(data.resetsAt, t);
+      text += ` (${remaining})`;
+    }
+    return text;
   }
 };
 var rateLimit7dSonnetWidget = {
@@ -583,7 +595,12 @@ var rateLimit7dSonnetWidget = {
   render(data, ctx) {
     const { translations: t } = ctx;
     const color = getColorForPercent(data.utilization);
-    return `${t.labels["7d_sonnet"]}: ${colorize(`${data.utilization}%`, color)}`;
+    let text = `${t.labels["7d_sonnet"]}: ${colorize(`${data.utilization}%`, color)}`;
+    if (data.resetsAt) {
+      const remaining = formatTimeRemaining(data.resetsAt, t);
+      text += ` (${remaining})`;
+    }
+    return text;
   }
 };
 

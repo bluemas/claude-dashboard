@@ -116,6 +116,7 @@ export interface Translations {
     '7d_sonnet': string;
   };
   time: {
+    days: string;
     hours: string;
     minutes: string;
     seconds: string;
